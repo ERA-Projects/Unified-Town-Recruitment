@@ -1,0 +1,62 @@
+ZVSE2
+!?FU(OnStartOrLoad);
+
+  !!SN:L^EraPlugins\erm_hooker.era^/?y1;
+
+  !!if&y1<>0;
+    !!SN:Ay1/^SetHook^/?y2;
+    !!FU(unif_CreateERMHook):Py2;
+  !!en;
+
+
+!?FU(unif_Player_GetTownsList);
+!#VA(playerID:x) (array:x);
+
+!!OW:W(playerID)/?(townsNum:y);
+!!VR(array):S-1;
+
+!!if&(townsNum:y);
+  !!FU(NewIntArray):P(townsNum:y)/?(array);
+
+  !!re i/0/(townsNum)/1/-1;
+    !!OW:W(playerID)/i/?(townId:y);
+    !!SN:M(array)/i/(townId);
+  !!en;
+  !!SN:F^ExtendArrayLifetime^/(array);
+
+!!en;
+
+!?FU(unif_Player_GetHeroesList);
+!#VA(playerID:x) (array:x);
+  !!VR(array):S-1;
+
+  !!OW:H(playerID)/1;
+  !!VR(heroNum:y):Sv1;
+  !!if&(heroNum:y);
+    !!FU(NewIntArray):P(heroNum:y)/?(array);
+
+    !!re i/2/(heroNum:y)/1/1;
+      !!VR(id:y):Si -2;
+      !!SN:M(array)/(id:y)/vi;
+    !!en;
+
+    !!SN:F^ExtendArrayLifetime^/(array);
+  !!en;
+
+!?FU(unif_GetPseudoAmount);
+!#VA(playerId:x) (townType:x) (monLevel:x) (result:x);
+!!OW:W(playerId)/?(townsNum:y);
+
+!!VR(result):S0;
+
+!!re i/0/(townsNum)/1/-1;
+  !!OW:W(playerId)/i/?(townId:y);
+  !!CA0/(townId):T?t;
+  !!if&(townType)=t;
+    !!CA0/(townId):M1/(monLevel)/?(numOfNative:y)/?(numOfUpg:y);
+    !!if&(numOfUpg)>(numOfNative);
+      !!VR(numOfNative:y):S(numOfUpg);
+    !!en;
+    !!VR(result):+(numOfNative);
+  !!en;
+!!en;

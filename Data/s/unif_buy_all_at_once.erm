@@ -1,0 +1,208 @@
+ZVSE2
+
+
+!?FU(unif_CreateERMHook);
+
+!!SN:Ex1/1/5577260/(unif_HOOK_OnRecruitMgrCtor);
+!!SN:Ex1/1/6053923/(unif_Town_GetCreatureGrowthType); 005C6023
+!!SN:Ex1/1/6055085/(unif_Town_GetCreatureGrowthHint); 5C64AD
+
+!!SN:Ex1/1/6150414/(unif_TownFort_GetCreaturesAmount); 5DD90E
+!!SN:Ex1/1/6148906/(unif_TownFort_RefreshCreaturesAmount); 5DD32A
+
+
+*!UN:C6055017/2/(OPCODE_NOP_2);
+*!UN:C6055110/2/(OPCODE_NOP_2);
+
+
+
+!?FU(unif_TownFort_RefreshCreaturesAmount);
+
+// check town owner
+!!UN:C(TOWN_MANAGER)/4/?(townMgr:y) C(townMgr)/56/4/?(town:y) C(town)/1/1/?(owner:y); 
+!!OW:C?y99/?(meId:y);
+
+!!if&(owner)=(meId);
+  !!UN:Cx1/(STRUCT_HOOK_CONTEXT_EBP)/4/?(ebp:y) C(town)/4/1/?(townType:y);
+  !!UN:Cx1/(STRUCT_HOOK_CONTEXT_EBX)/4/?(monLevel:y);
+  !!FU(unif_GetPseudoAmount):P(meId)/(townType)/(monLevel)/?(result:y);
+  !!SN:X?y99/0;
+  !!UN:Cx1/(STRUCT_HOOK_CONTEXT_EAX)/4/(result:y);
+  !!UN:Cx1/(STRUCT_HOOK_CONTEXT_RET)/4/6148911;
+!!en;
+
+!?FU(unif_TownFort_GetCreaturesAmount);
+
+// check town owner
+!!UN:C(TOWN_MANAGER)/4/?(townMgr:y) C(townMgr)/56/4/?(town:y) C(town)/1/1/?(owner:y); 
+!!OW:C?y99/?(meId:y);
+
+!!if&(owner)=(meId);
+  !!UN:C(town)/4/1/?(townType:y);
+  !!UN:Cx1/(STRUCT_HOOK_CONTEXT_EDX)/4/?(dwellLevel:y);
+  !!if&(dwellLevel)>6;
+    !!VR(dwellLevel):-7;
+  !!en;
+  !!FU(unif_GetPseudoAmount):P(meId)/(townType)/(dwellLevel)/?(result:y);
+  !!SN:X?y99/0;
+  !!UN:Cx1/(STRUCT_HOOK_CONTEXT_EAX)/4/(result);
+  !!UN:Cx1/(STRUCT_HOOK_CONTEXT_RET)/4/6150419;
+!!en;
+
+
+!?FU(unif_Town_GetCreatureGrowthType)&999;
+
+!!UN:Cx1/(STRUCT_HOOK_CONTEXT_EDX)/4/?(dwellLevel:y);
+!!if&(dwellLevel)>=0/(dwellLevel)<=13;
+  !!VR(isUpg:y):S(dwellLevel) -6 F0/1;;
+  !!VRi^unif_monster_level^:S-7 *(isUpg) +(dwellLevel:y);
+!!en;
+
+!?FU(unif_Town_GetCreatureGrowthHint)&999;
+!!UN:Cx1/(STRUCT_HOOK_CONTEXT_EBP)/4/?(ebp:y) C(ebp)/8/4/?(town:y);
+
+!!VR(monLevel:y):Si^unif_monster_level^;
+!!VRi^unif_monster_level^:S(NULL);
+!!CA-1:O?(owner:y) T?(townType:y);
+!!OW:C?y99/?(meId:y);
+
+
+!!if&(owner)=(meId);
+  !!FU(unif_GetPseudoAmount):P(meId)/(townType)/(monLevel)/?(result:y);
+  !!SN:B(ADDR_TEXT_BUFFER)/d/^%(result:y)^;
+!!en;
+
+
+!?FU(unif_HOOK_OnRecruitMgrCtor);
+!!UN:Cx1/(STRUCT_HOOK_CONTEXT_EBP)/4/?(ebp:y);
+!!UN:C(ebp)/8/4/?(town:y) C(ebp)/12/4/?(dwellLevel:y) C(ebp)/16/4/?(isTown:y);
+!!if&(isTown)/(town)/(dwellLevel)>=0/(dwellLevel)<=13;
+  !!UN:C(town)/1/?i^unif_hd_mod_town_id^; ();
+  !!VRi^unif_hd_mod_recruitment^:S(TRUE);
+  !!VRi^unif_hd_mod_dwlling_id^:S(dwellLevel);
+!!en;
+
+
+!?FU(OnOpenRecruitDlg);/i^unif_dlg_id^=(NULL);
+*!FU(ClearScreenLog):P;
+!!RD:I?y99/?(townId:y)/?(buildingId:y)/?(slotId:y);
+
+!!if&i^unif_hd_mod_recruitment^;
+  !!VR(townId):Si^unif_hd_mod_town_id^;
+  !!VR(buildingId):Si^unif_hd_mod_dwlling_id^;
+!!en;
+
+!!if&(townId)<>(NO_TOWN)/(buildingId:y)<>-1;
+  !!VRi^unif_dlg_id^:Sy99;
+  !!VR(isUpg:y):S(buildingId) -6 F0/1;;
+  !!VR(monLevel:y):S-7 *(isUpg) +(buildingId:y);
+  !!CA0/(townId):O?(owner:y) T?(currentType:y);
+
+  !!OW:W(owner)/?(townsNum:y);
+
+  !!VR(creaturesToShow:y):S0;
+
+  !!VR(maxTownId:y):S0;
+  *!RD:M^unif_current_town_id^/(townId);
+  !!re i/0/(townsNum)/1/-1;
+    !!OW:W(owner)/i/?(townId:y);
+    !!CA0/(townId):T?t;
+    !!if&(currentType)=t;
+      !!CA0/(townId):M1/(monLevel)/?(numOfNative:y)/?(numOfUpg:y);
+      !!RD:M^unif_native_monsters_from_town_%(townId:y)^/(numOfNative) M^unif_upgrade_monsters_from_town_%(townId:y)^/(numOfUpg);
+      *!IF:M^%(numOfUpg)^;
+      !!if&(numOfUpg)>(numOfNative);
+        !!VR(numOfNative:y):S(numOfUpg);
+        !!RD:M^unif_native_monsters_from_town_%(townId:y)^/(numOfNative);
+      !!en;
+      !!VR(creaturesToShow:y):+(numOfNative);
+      !!VR(maxTownId)&(maxTownId)<(townId):S(townId);
+    !!en;
+  !!en;
+  !!RD:M^unif_monster_level^/(monLevel);
+  !!RD:M^unif_max_town_id^/(maxTownId);
+
+  *!IF:L^%(slotId)^;
+  !!RD:C0/?y99/(creaturesToShow);/
+  !!RD:M^unif_mon_before^/(creaturesToShow) M^unif_mon_added^/(creaturesToShow);
+!!en;
+
+!?FU(OnCloseRecruitDlg);
+
+!!RD:C0/?y99/?(creaturesLeft:y); C1/?y99/?(creaturesLeftA:y); C0/?y99/2;?(creaturesLeftA:y);
+
+!!RD:I?y99/?(realTownId:y)/?(buildingId:y)/?(slotId:y);
+
+!!if&i^unif_dlg_id^=y99;
+  !!if&i^unif_hd_mod_recruitment^;
+    !!VR(realTownId):Si^unif_hd_mod_town_id^;
+    !!VR(buildingId):Si^unif_hd_mod_dwlling_id^;
+
+  !!en;
+
+  !!RD:M^unif_mon_before^/?(creaturesBefore:y);
+  !!RD:M^unif_max_town_id^/?(maxTownId:y);
+  !!RD:M^unif_monster_level^/?(monLevel:y);
+
+
+  !!VR(creaturesBought:y):S(creaturesBefore) -(creaturesLeft);
+
+
+
+  !!RD:M^unif_native_monsters_from_town_%(realTownId:y)^/?(numOfNative:y) M^unif_native_monsters_from_town_%(realTownId:y)^/0;
+  !!VR(creaturesToSet:y):S0;
+
+  // if only bought from this town 
+  !!if&(creaturesBought)<=(numOfNative);
+    !!VR(creaturesToSet:y):S(numOfNative) -(creaturesBought);
+    !!RD:C0/?y99/(creaturesToSet:y);
+  !!el;
+    // if we bought more than current town had
+
+    // remove creatures fron current town anyway
+    !!RD:C0/?y99/0;
+
+    !!VR(creaturesBought):-(numOfNative);
+
+    // iterate all the towns and decrease creatures
+    *!IF:M^creaturesBought %(creaturesBought)^;
+    !!re (townId:y)/0/(maxTownId);/1/-1;
+      !!RD:M^unif_native_monsters_from_town_%(townId:y)^/?(numOfNative:y) M^unif_native_monsters_from_town_%(townId:y)^/0;
+
+      !!if&(numOfNative:y);
+        !!VR(creaturesToSet:y):S(numOfNative) -(creaturesBought) F0/(numOfNative);
+        !!VR(creaturesBoughtHere:y):S(numOfNative) -(creaturesToSet);
+
+        !!RD:M^unif_upgrade_monsters_from_town_%(townId:y)^/?(numOfUpg:y);
+
+
+        // set upgraded mon as well
+        !!if&(numOfUpg);
+          !!VR(numOfUpg):S(creaturesToSet);
+        !!en;
+        !!CA0/(townId):M1/(monLevel)/(creaturesToSet:y)/(numOfUpg:y);
+        !!VR(creaturesBought):-(creaturesBoughtHere);
+      !!en;
+
+      !!if&(creaturesBought)=0;
+        !!br;
+      !!en;
+    !!en;
+
+  !!en;
+
+  !!if&i^unif_hd_mod_recruitment^;
+    // refresh screen after dlg close
+    !!UN:C(TOWN_MANAGER)/4/?(townMgr:y);
+    !!if&(townMgr);
+      !!UN:C(townMgr)/280/4/?(townDlg:y) C(townMgr)/56/4/?(town:y);
+      !!if&(townDlg)/(town);
+        !!SN:E6053696/(CALLCONV_THISCALL)/(townDlg)/(town);
+      !!en;
+    !!en;
+    !!VRi^unif_hd_mod_recruitment^:S(FALSE);
+    !!VRi^unif_hd_mod_town_id^:S(NULL);
+    !!VRi^unif_hd_mod_dwlling_id^:S(NULL);
+  !!en;
+
+!!en;

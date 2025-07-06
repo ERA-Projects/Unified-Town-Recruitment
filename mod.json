@@ -1,0 +1,30 @@
+{
+	"caption": {
+		"en_US": "Unified Town Recruitment",
+		"ru_RU": "Унифицированный найм в городах"
+	},
+	"description": {
+		"full": {
+			"en_US": "readme.md",
+			"ru_RU": "readme_ru.md"
+		},
+		"short": {
+			"en_US": "Unified system for recruiting creatures in towns.",
+			"ru_RU": "Унифицированная система найма существ в городах."
+		}
+	},
+	"author": "daemon_n, idea: 𝑴𝒂𝒙𝒊𝒎𝒐𝑴𝒊𝒅𝒏𝒊𝒈𝒉𝒕",
+	"homepage": "",
+	"icon": {
+		"file": "",
+		"index": 0
+	},
+	"mod_version": "1.0.0",
+	"priority": 0,
+	"category": "cheats",
+	"compatibility": {
+		"class": "default",
+		"entries": {},
+		"requires":[]
+	}
+}
