@@ -14,9 +14,9 @@
 		}
 	},
 	"author": "daemon_n, idea: 𝑴𝒂𝒙𝒊𝒎𝒐𝑴𝒊𝒅𝒏𝒊𝒈𝒉𝒕",
-	"homepage": "",
+	"homepage": "https://github.com/ERA-Projects/Unified-Town-Recruitment",
 	"icon": {
-		"file": "",
+		"file": "icon.png",
 		"index": 0
 	},
 	"mod_version": "1.0.0",
@@ -25,6 +25,6 @@
 	"compatibility": {
 		"class": "default",
 		"entries": {},
-		"requires":[]
+		"requires": ["Era Erm Framework"]
 	}
 }
