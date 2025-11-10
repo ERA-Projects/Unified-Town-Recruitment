@@ -1,5 +1,12 @@
 ZVSE2
 !?FU(OnStartOrLoad);
+  !!SN:F^PluginExists^/^new_towns^;
+  !!FU&v1:E;
+  !!SN:F^PluginExists^/^amethyst2_4^;
+  !!FU&v1:E;
+  *!SN:F^PluginExists^/^new_towns^;
+  *!FU&v1:E;
+
 
   !!SN:L^EraPlugins\erm_hooker.era^/?y1;
 
